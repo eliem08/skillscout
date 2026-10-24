@@ -44,7 +44,7 @@ def main(argv=None):
         rows = cat.compare(a.names)
         keys = list(rows[0])
         for k in keys:
-            print(f"{k:<11}" + "".join(f"{str(r[k]):<24}" for r in rows))
+            print(f"{k:<11}" + "".join(f"{r[k]!s:<24}" for r in rows))
     return 0
 
 

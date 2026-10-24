@@ -1,4 +1,5 @@
 """Index, score, rate and search agent skills (SKILL.md)."""
+
 from __future__ import annotations
 
 import json
@@ -6,7 +7,7 @@ import math
 import os
 import re
 from collections import Counter
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 
 __all__ = ["Skill", "parse_skill", "index_dir", "quality", "Catalog"]
 
@@ -83,10 +84,17 @@ def parse_skill(path: str) -> Skill | None:
     if not meta.get("description"):
         return None
     tags = meta.get("tags", [])
-    s = Skill(name=name, description=meta["description"], path=folder, body=body,
-              tags=tags if isinstance(tags, list) else [tags], version=meta.get("version", ""), author=meta.get("author", ""),
-              has_scripts=os.path.isdir(os.path.join(folder, "scripts")),
-              has_references=os.path.isdir(os.path.join(folder, "references")))
+    s = Skill(
+        name=name,
+        description=meta["description"],
+        path=folder,
+        body=body,
+        tags=tags if isinstance(tags, list) else [tags],
+        version=meta.get("version", ""),
+        author=meta.get("author", ""),
+        has_scripts=os.path.isdir(os.path.join(folder, "scripts")),
+        has_references=os.path.isdir(os.path.join(folder, "references")),
+    )
     s.quality = quality(s)
     return s
 
@@ -130,7 +138,10 @@ class Catalog:
 
     def search(self, query: str, top=10) -> list[tuple[str, float]]:
         q = _tokens(query)
-        docs = {n: _tokens(f"{s.name} {s.name} {s.description} {s.description} {' '.join(s.tags)} {s.body}") for n, s in self.skills.items()}
+        docs = {
+            n: _tokens(f"{s.name} {s.name} {s.description} {s.description} {' '.join(s.tags)} {s.body}")
+            for n, s in self.skills.items()
+        }
         N = len(docs) or 1
         avgdl = sum(len(d) for d in docs.values()) / N if docs else 1
         df = Counter(t for d in docs.values() for t in set(d))
@@ -154,7 +165,16 @@ class Catalog:
         rows = []
         for n in names:
             s = self.skills[n]
-            rows.append({"name": n, "quality": s.quality, "rating": round(self.avg_rating(s), 2), "reviews": len(s.ratings),
-                         "scripts": s.has_scripts, "references": s.has_references, "version": s.version or "-",
-                         "tags": ", ".join(s.tags) or "-"})
+            rows.append(
+                {
+                    "name": n,
+                    "quality": s.quality,
+                    "rating": round(self.avg_rating(s), 2),
+                    "reviews": len(s.ratings),
+                    "scripts": s.has_scripts,
+                    "references": s.has_references,
+                    "version": s.version or "-",
+                    "tags": ", ".join(s.tags) or "-",
+                }
+            )
         return rows
