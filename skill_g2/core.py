@@ -120,7 +120,7 @@ class Catalog:
 
     @classmethod
     def load(cls, path):
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8-sig") as fh:
             return cls([Skill(**d) for d in json.load(fh)])
 
     def save(self, path):
