@@ -1,0 +1,43 @@
+[
+ {
+  "op": "index",
+  "payload": {
+   "root": {
+    "files": [
+     {
+      "name": "notes/SKILL.md",
+      "content": "---\nname: notes\ndescription: notes helper\n---\nTODO: write this skill\n"
+     },
+     {
+      "name": "pdf/SKILL.md",
+      "content": "---\nname: pdf\ndescription: Use this skill whenever the user wants to fill, merge, split or extract text and tables from PDF files, including fillable forms.\nversion: 1.2.0\ntags: [pdf, documents, forms]\n---\n# PDF\n\n## When to use\nAny task that reads or writes a `.pdf`.\n\n## Steps\n1. Detect whether the PDF has fillable form fields.\n2. Fill fields by name, or overlay text for flat forms.\n3. Validate the output opens and fields are populated.\n\n```python\nfrom pypdf import PdfReader\nfields = PdfReader(\"form.pdf\").get_fields()\n```\n"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "op": "search",
+  "payload": {
+   "query": "fill pdf forms"
+  }
+ },
+ {
+  "op": "rate",
+  "payload": {
+   "name": "pdf",
+   "stars": 5,
+   "user": "alice",
+   "text": ""
+  }
+ },
+ {
+  "op": "compare",
+  "payload": {
+   "names": [
+    "pdf",
+    "notes"
+   ]
+  }
+ }
+]

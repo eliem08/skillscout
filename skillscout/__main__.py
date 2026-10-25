@@ -6,7 +6,7 @@ import sys
 from .core import Catalog, index_dir
 
 
-def _run(argv=None):
+def build_parser():
     ap = argparse.ArgumentParser(prog="skillscout")
     sub = ap.add_subparsers(dest="cmd", required=True)
     i = sub.add_parser("index")
@@ -24,6 +24,11 @@ def _run(argv=None):
     c = sub.add_parser("compare")
     c.add_argument("catalog")
     c.add_argument("names", nargs="+")
+    return ap
+
+
+def _run(argv=None):
+    ap = build_parser()
     a = ap.parse_args(argv)
 
     if a.cmd == "index":

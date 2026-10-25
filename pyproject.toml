@@ -23,6 +23,7 @@ dev = ["ruff>=0.6"]
 
 [project.scripts]
 skillscout = "skillscout.__main__:main"
+skillscout-web = "skillscout.web:main"
 
 [project.urls]
 Repository = "https://github.com/eliem08/skillscout"
