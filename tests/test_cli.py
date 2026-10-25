@@ -11,7 +11,7 @@ import pathlib
 import tempfile
 import unittest
 
-from skill_g2.__main__ import main
+from skillscout.__main__ import main
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = [

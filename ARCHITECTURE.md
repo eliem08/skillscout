@@ -1,4 +1,4 @@
-# Architecture — skill-g2
+# Architecture — skillscout
 
 ## 1. Scope
 Discovery and comparison for agent skills (SKILL.md packages; later MCP servers and actions).

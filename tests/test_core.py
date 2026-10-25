@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from skill_g2 import Catalog, index_dir
+from skillscout import Catalog, index_dir
 
 GOOD = """---
 name: pdf

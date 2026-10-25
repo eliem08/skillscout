@@ -1,15 +1,45 @@
-# skill-g2
+<!-- sell-kit:start -->
+# SkillScout
 
-[![CI](https://github.com/eliem08/skill-g2/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/skill-g2/actions/workflows/ci.yml)
+[![CI](https://github.com/eliem08/skillscout/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/skillscout/actions/workflows/ci.yml)
 
-> **G2 for skills** — find the best skills for your agent.
+> **Find the best and safest skills for your AI agent.**
 
-Agent skills (`SKILL.md` folders for Claude Code and friends, MCP servers,
-GPT actions) are exploding, and there's no way to tell the good ones from
-the abandoned ones. `skill-g2` indexes skills, scores their quality, lets
-users rate them, and ranks search results the way G2 ranks software.
+**Who it's for:** Developers and teams installing third-party agent skills.
 
-## What the MVP does
+**The problem:** Agent skill libraries are exploding, and there's no way to tell a well-built skill from a broken or malicious one.
+
+**What you get:** Index SKILL.md folders, score quality, flag risky scripts (pipe-to-shell, credential access, prompt injection), and search and compare with ratings.
+
+## Quickstart
+
+Customers receive a release archive with the wheel and the examples. Python 3.10+ and no other dependencies.
+
+```bash
+pip install skillscout-0.1.0-py3-none-any.whl
+skillscout index examples/skills -o skills.json
+skillscout search skills.json "fill pdf forms"
+skillscout rate skills.json pdf 5 --user alice
+```
+
+## Pricing
+
+Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+
+| Plan | Price | Includes |
+|---|---|---|
+| **Developer** | $9 per month | Unlimited indexing; Risk flags; Search and compare |
+| **Team** | $49 per month | Shared catalog; Ratings and reviews; Approved-skill lists |
+| **Business** | $299 per month | Policy enforcement; Audit export; Priority support |
+
+To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+
+## Licence
+
+Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a paid plan or an active trial; see [LICENSE](LICENSE).
+<!-- sell-kit:end -->
+
+## What it does
 
 - **Indexer**: walks a directory tree for `SKILL.md`, parses the YAML-style
   frontmatter (`name`, `description`, optional `tags`, `version`, `author`)
@@ -27,10 +57,10 @@ users rate them, and ranks search results the way G2 ranks software.
 
 ```bash
 pip install -e .
-skill-g2 index ~/.claude/skills -o skills.json
-skill-g2 search skills.json "pdf forms"
-skill-g2 rate skills.json pdf 5 --user alice --text "Fills forms flawlessly"
-skill-g2 compare skills.json pdf docx
+skillscout index ~/.claude/skills -o skills.json
+skillscout search skills.json "pdf forms"
+skillscout rate skills.json pdf 5 --user alice --text "Fills forms flawlessly"
+skillscout compare skills.json pdf docx
 ```
 
 ## Roadmap
@@ -51,8 +81,8 @@ ruff check . && ruff format --check .               # lint + format
 ```
 
 ```
-skill_g2/core.py       domain logic (pure, importable, fully tested)
-skill_g2/__main__.py   CLI (`skill-g2 ...` / `python -m skill_g2 ...`)
+skillscout/core.py       domain logic (pure, importable, fully tested)
+skillscout/__main__.py   CLI (`skillscout ...` / `python -m skillscout ...`)
 tests/                unit tests + generated CLI smoke tests
 examples/             sample inputs used by the docs and smoke tests
 ```

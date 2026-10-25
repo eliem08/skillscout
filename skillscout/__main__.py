@@ -7,7 +7,7 @@ from .core import Catalog, index_dir
 
 
 def _run(argv=None):
-    ap = argparse.ArgumentParser(prog="skill-g2")
+    ap = argparse.ArgumentParser(prog="skillscout")
     sub = ap.add_subparsers(dest="cmd", required=True)
     i = sub.add_parser("index")
     i.add_argument("root")
