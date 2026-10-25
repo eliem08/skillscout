@@ -47,7 +47,7 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | **Team** | $49 per month | Shared catalog; Ratings and reviews; Approved-skill lists |
 | **Business** | $299 per month | Policy enforcement; Audit export; Priority support |
 
-To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+To start a trial or buy a plan, [request access](https://github.com/eliem08/skillscout/issues/new?title=SkillScout%20trial&labels=sales).
 
 ## Licence
 
