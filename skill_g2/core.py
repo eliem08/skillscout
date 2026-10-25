@@ -9,7 +9,17 @@ import re
 from collections import Counter
 from dataclasses import asdict, dataclass, field
 
-__all__ = ["Skill", "parse_skill", "index_dir", "quality", "Catalog"]
+__all__ = ["Skill", "parse_skill", "index_dir", "quality", "risk_flags", "Catalog"]
+
+# Skills are instructions and code an agent will run, so a catalog must surface what they could do before ranking.
+RISK_PATTERNS = {
+    "pipe_to_shell": r"(curl|wget)[^\n|]*\|\s*(ba|z)?sh\b|iex\s*\(\s*(iwr|invoke-webrequest)",
+    "destructive_command": r"\brm\s+-\w*r\w*f|\bformat\s+c:|\bmkfs\b|\bdel\s+/[sq]",
+    "prompt_injection": r"\b(ignore|disregard)\b.{0,40}\b(previous|prior|above|system)\b.{0,20}\b(instructions?|prompt)",
+    "credential_access": r"\.ssh/|id_rsa|\.aws/credentials|\.env\b|keychain|security\s+find-generic-password",
+    "obfuscated_payload": r"base64\s+(-d|--decode)|frombase64string|eval\s*\(\s*(atob|base64)",
+}
+SCRIPT_EXTS = {".sh", ".bash", ".zsh", ".ps1", ".py", ".js", ".mjs", ".ts", ".rb", ".pl", ".bat", ".cmd"}
 
 
 @dataclass
@@ -25,6 +35,7 @@ class Skill:
     has_references: bool = False
     quality: int = 0
     ratings: dict = field(default_factory=dict)  # user -> {"stars": int, "text": str}
+    risks: list = field(default_factory=list)
 
 
 def _frontmatter(text: str) -> tuple[dict, str]:
@@ -52,6 +63,20 @@ def _frontmatter(text: str) -> tuple[dict, str]:
     return meta, m.group(2)
 
 
+def risk_flags(text: str) -> list[str]:
+    return [name for name, rx in RISK_PATTERNS.items() if re.search(rx, text, re.I | re.S)]
+
+
+def _script_text(folder: str, limit: int = 200_000) -> str:
+    chunks = []
+    for r, _, files in os.walk(os.path.join(folder, "scripts")):
+        for f in files:
+            if os.path.splitext(f)[1].lower() in SCRIPT_EXTS:
+                with open(os.path.join(r, f), encoding="utf-8", errors="ignore") as fh:
+                    chunks.append(fh.read(limit))
+    return "\n".join(chunks)
+
+
 def quality(s: Skill) -> int:
     score = 0
     d = s.description.lower()
@@ -73,6 +98,8 @@ def quality(s: Skill) -> int:
         score -= 15
     if s.version:
         score += 5
+    if s.risks:
+        score = min(score, 40)  # well-written is not the same as safe to run
     return max(0, min(100, score))
 
 
@@ -95,6 +122,7 @@ def parse_skill(path: str) -> Skill | None:
         has_scripts=os.path.isdir(os.path.join(folder, "scripts")),
         has_references=os.path.isdir(os.path.join(folder, "references")),
     )
+    s.risks = risk_flags(f"{s.description}\n{body}\n{_script_text(folder)}")
     s.quality = quality(s)
     return s
 
@@ -116,7 +144,12 @@ def _tokens(text):
 
 class Catalog:
     def __init__(self, skills: list[Skill] | None = None):
-        self.skills = {s.name: s for s in skills or []}
+        self.skills = {}
+        for s in skills or []:
+            if s.name in self.skills:  # never let a second skill silently shadow the first
+                s.risks = sorted({*s.risks, "name_collision"})
+                s.name = f"{s.name}@{os.path.basename(s.path) or s.path}"
+            self.skills[s.name] = s
 
     @classmethod
     def load(cls, path):
@@ -130,7 +163,11 @@ class Catalog:
     def rate(self, name, user, stars, text=""):
         if not 1 <= stars <= 5:
             raise ValueError("stars must be 1-5")
-        self.skills[name].ratings[user] = {"stars": stars, "text": text}
+        skill = self.skills[name]
+        user = " ".join(str(user).split()).casefold()
+        if skill.author and user == " ".join(skill.author.split()).casefold():
+            raise ValueError("authors cannot rate their own skill")
+        skill.ratings[user] = {"stars": stars, "text": text}
 
     def avg_rating(self, s: Skill, prior=3.5, weight=3) -> float:
         stars = [r["stars"] for r in s.ratings.values()]

@@ -30,14 +30,15 @@ def _run(argv=None):
         skills = index_dir(a.root)
         Catalog(skills).save(a.out)
         for sk in sorted(skills, key=lambda x: -x.quality):
-            print(f"{sk.quality:>3}  {sk.name}")
+            print(f"{sk.quality:>3}  {sk.name}" + (f"  RISK: {', '.join(sk.risks)}" if sk.risks else ""))
         print(f"indexed {len(skills)} skills -> {a.out}")
         return 0
     cat = Catalog.load(a.catalog)
     if a.cmd == "search":
         for name, score in cat.search(a.query):
             sk = cat.skills[name]
-            print(f"{score:7.3f}  {name:<28} q={sk.quality:<3} {cat.avg_rating(sk):.1f}*  {sk.description[:70]}")
+            risk = f" [RISK: {', '.join(sk.risks)}]" if sk.risks else ""
+            print(f"{score:7.3f}  {name:<28} q={sk.quality:<3} {cat.avg_rating(sk):.1f}*  {sk.description[:70]}{risk}")
     elif a.cmd == "rate":
         cat.rate(a.name, a.user, a.stars, a.text)
         cat.save(a.catalog)
