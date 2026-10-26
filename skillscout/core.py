@@ -156,6 +156,13 @@ class Catalog:
         with open(path, encoding="utf-8-sig") as fh:
             return cls([Skill(**d) for d in json.load(fh)])
 
+    @classmethod
+    def seed(cls):
+        """The bundled starter catalog, so search and compare work before anyone runs `index`."""
+        from .seed import SEED
+
+        return cls([Skill(**d) for d in SEED])
+
     def save(self, path):
         with open(path, "w", encoding="utf-8") as fh:
             json.dump([asdict(s) for s in self.skills.values()], fh, indent=2)
@@ -195,6 +202,8 @@ class Catalog:
                 continue
             s = self.skills[n]
             score = bm25 * (0.6 + 0.4 * s.quality / 100) * (0.7 + 0.3 * self.avg_rating(s) / 5)
+            if s.risks:  # a safe skill outranks a risky one of similar relevance
+                score *= 0.5
             results.append((n, round(score, 4)))
         return sorted(results, key=lambda x: -x[1])[:top]
 
@@ -212,6 +221,7 @@ class Catalog:
                     "references": s.has_references,
                     "version": s.version or "-",
                     "tags": ", ".join(s.tags) or "-",
+                    "risks": ", ".join(s.risks) or "none found",
                 }
             )
         return rows

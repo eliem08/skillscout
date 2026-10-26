@@ -38,7 +38,11 @@ def _run(argv=None):
             print(f"{sk.quality:>3}  {sk.name}" + (f"  RISK: {', '.join(sk.risks)}" if sk.risks else ""))
         print(f"indexed {len(skills)} skills -> {a.out}")
         return 0
-    cat = Catalog.load(a.catalog)
+    if os.path.exists(a.catalog):
+        cat = Catalog.load(a.catalog)
+    else:  # no index yet: start from the bundled catalog (rate then saves it as this catalog)
+        print(f"{a.catalog} not found; using the bundled starter catalog", file=sys.stderr)
+        cat = Catalog.seed()
     if a.cmd == "search":
         for name, score in cat.search(a.query):
             sk = cat.skills[name]
