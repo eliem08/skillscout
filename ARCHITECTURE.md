@@ -41,3 +41,18 @@ flags shell execution, network egress and credential access in bundled scripts.
 ## 6. Risks
 Skill authors gaming quality signals, so telemetry-based retention (still enabled after 30 days)
 becomes the main ranking signal once there's volume.
+
+## 7. Limitations (sell-ready audit, 2026-10-27)
+- No feature gating by plan: every API key unlocks the same software. Team/Business
+  pricing is support and onboarding, not gated features; approved-skill lists, policy
+  enforcement, and audit export are roadmap, not shipped, and were removed from sales copy.
+- The bundled starter catalog is a snapshot: it must match a fresh index of
+  examples/skills (enforced by a test), and it is not a live crawl of GitHub or registries.
+- Risk flags are static pattern matches over SKILL.md text and bundled scripts; they are
+  not a sandbox, a full security audit, or a guarantee that a skill is safe.
+- Docker build and a live Render/Fly deployment were not verified in the audit environment
+  (no Docker binary there); Dockerfile, render.yaml, and fly.toml are the same template
+  shape as vibe-lube, but a deployment claim remains "not verified" until one is made.
+- Stripe prices were not verified against a live Stripe account in this run; checkout and
+  revocation are covered in tests with mocked Stripe calls, and the README example now
+  uses developer/team/business plan keys to match the plan names.

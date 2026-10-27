@@ -48,7 +48,7 @@ To sell self-serve, set four variables and point a Stripe webhook at `https://<y
 |---|---|
 | `STRIPE_SECRET_KEY` | `sk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
-| `STRIPE_PRICES` | `team=price_123,business=price_456` |
+| `STRIPE_PRICES` | `developer=price_123,team=price_456,business=price_789` |
 | `PUBLIC_URL` | `https://skillscout.example.com` |
 
 Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key once on the success page. Cancelling the subscription revokes the key. A selling server always requires a key.
@@ -59,11 +59,13 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 
 | Plan | Price | Includes |
 |---|---|---|
-| **Developer** | $9 per month | Unlimited indexing; Risk flags; Search and compare |
-| **Team** | $49 per month | Shared catalog; Ratings and reviews; Approved-skill lists |
-| **Business** | $299 per month | Policy enforcement; Audit export; Priority support |
+| **Developer** | $9 per month | Indexing; Risk flags; Search and compare |
+| **Team** | $49 per month | Everything in Developer; Ratings and reviews; Shared catalog file (JSON) |
+| **Business** | $299 per month | Everything in Team; Priority support |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/skillscout/issues/new?title=SkillScout%20trial&labels=sales).
+
+Plan note, owner decision on merge: there is no feature gating by plan in the code — every API key unlocks the same software (index, search, compare, ratings, risk flags). Team and Business differ by human support and onboarding, not by gated software features. Approved-skill lists, policy enforcement, and audit export are not built and have been removed from the sales copy; they remain roadmap items, not shipped features.
 
 ## Licence
 
@@ -97,8 +99,9 @@ skillscout compare skills.json pdf docx
 ## Roadmap
 
 - Crawl public GitHub skill repos and MCP registries
-- Usage telemetry opt-in ("installed by 2.3k agents, 91% still enabled after 30 days")
-- Security scan per skill (shell commands, network calls) — trust badge
+- Usage telemetry opt-in
+- Policy enforcement, approved-skill lists, and audit export (not shipped yet)
+- Deeper security scan per skill — trust badge (basic static risk flags already ship)
 
 ## Development
 
@@ -109,6 +112,7 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -e ".[dev]"
 python -m unittest discover -s tests -t .           # unit + CLI smoke tests
 ruff check . && ruff format --check .               # lint + format
+python -m pip wheel . --no-deps -w dist            # customer wheel, as in Quickstart
 ```
 
 ```
