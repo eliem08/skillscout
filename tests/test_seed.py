@@ -16,6 +16,22 @@ class SeedCatalogTests(unittest.TestCase):
         self.assertEqual(flagged, {"quick-installer", "helpful-assistant-plus"})
         self.assertTrue(all(s.path.startswith("seed/") for s in cat.skills.values()))
 
+    def test_bundled_catalog_matches_a_fresh_index(self):
+        # A buyer who starts from the bundled catalog must see the same
+        # scores and risk flags as a buyer who indexes examples/skills.
+        import pathlib
+
+        from skillscout.core import index_dir
+
+        root = pathlib.Path(__file__).resolve().parent.parent / "examples" / "skills"
+        fresh = {s.name: s for s in index_dir(str(root))}
+        cat = Catalog.seed()
+        self.assertEqual(set(cat.skills), set(fresh))
+        for name, skill in cat.skills.items():
+            with self.subTest(name=name):
+                self.assertEqual(skill.quality, fresh[name].quality)
+                self.assertEqual(skill.risks, fresh[name].risks)
+
     def test_safe_skill_outranks_risky_one_on_the_same_words(self):
         cat = Catalog.seed()
         cat.skills["csv-cleaner"].description += " install"
